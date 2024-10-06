@@ -12,5 +12,4 @@ class CapFitnessTrackerApplicationTests {
     void contextLoads() {
         assertTrue(true);
     }
-
 }

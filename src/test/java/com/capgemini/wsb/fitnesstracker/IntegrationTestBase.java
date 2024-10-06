@@ -57,6 +57,4 @@ public abstract class IntegrationTestBase {
     protected List<Training> getAllTrainings() {
         return trainingRepository.findAll();
     }
-
-
 }
