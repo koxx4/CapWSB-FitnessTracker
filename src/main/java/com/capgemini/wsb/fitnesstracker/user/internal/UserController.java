@@ -1,9 +1,9 @@
 package com.capgemini.wsb.fitnesstracker.user.internal;
 
 import com.capgemini.wsb.fitnesstracker.user.api.User;
+import com.capgemini.wsb.fitnesstracker.user.api.UserDetailsDto;
+import com.capgemini.wsb.fitnesstracker.user.api.UserSimpleDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,10 +14,10 @@ import java.util.List;
 class UserController {
 
     private final UserServiceImpl userService;
-
     private final UserMapper userMapper;
 
-    @GetMapping
+    // /v1/users/complex
+    @GetMapping("complex")
     public List<UserDto> getAllUsers() {
         return userService.findAllUsers()
                           .stream()
@@ -25,14 +25,28 @@ class UserController {
                           .toList();
     }
 
-    @PostMapping
-    public User addUser(@RequestBody UserDto userDto) throws InterruptedException {
-
-        // Demonstracja how to use @RequestBody
-        System.out.println("User with e-mail: " + userDto.email() + "passed to the request");
-
-        // TODO: saveUser with Service and return User
-        return null;
+    // /v1/users/simple
+    @GetMapping("/simple")
+    public List<UserSimpleDto> getAllSimpleUsers() {
+        return userService.findAllUsers()
+                .stream()
+                .map(userMapper::toSimpleDto)
+                .toList();
     }
 
+    // /v1/users/simple
+    @GetMapping("/details")
+    public List<UserDetailsDto> getAllDetailedUsers() {
+        return userService.findAllUsers()
+                .stream()
+                .map(userMapper::toDetailsDto)
+                .toList();
+    }
+
+    @PostMapping
+    public User addUser(@RequestBody UserDto userDto) {
+        System.out.println("User with e-mail: " + userDto.email() + "passed to the request");
+
+        return userService.createUser(userMapper.toEntity(userDto));
+    }
 }
