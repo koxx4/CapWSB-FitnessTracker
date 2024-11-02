@@ -2,7 +2,6 @@ package com.capgemini.wsb.fitnesstracker.user.internal;
 
 import com.capgemini.wsb.fitnesstracker.user.api.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,9 +46,16 @@ class UserController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<UserDetailsDto> getUserByEmail(@RequestParam String email) {
+    public ResponseEntity<UserDto> getUserByEmail(@RequestParam String email) {
         return userProvider.findUserByEmail(email)
-                .map(user -> ok(userMapper.toDetailsDto(user)))
+                .map(user -> ok(userMapper.toDto(user)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable Long userId) {
+        return userProvider.findUser(userId)
+                .map(user -> ok(userMapper.toDto(user)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

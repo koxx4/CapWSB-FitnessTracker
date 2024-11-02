@@ -73,7 +73,7 @@ class UserApiIntegrationTest extends IntegrationTestBase {
     void shouldReturnDetailsAboutUser_whenGettingUserById() throws Exception {
         User user1 = existingUser(generateUser());
 
-        mockMvc.perform(get("/v1/users/{id}", user1.getId()).contentType(APPLICATION_JSON))
+        mockMvc.perform(get("/v1/users/{userId}", user1.getId()).contentType(APPLICATION_JSON))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty())
@@ -88,12 +88,11 @@ class UserApiIntegrationTest extends IntegrationTestBase {
     void shouldReturnDetailsAboutUser_whenGettingUserByEmail() throws Exception {
         User user1 = existingUser(generateUser());
 
-        mockMvc.perform(get("/v1/users/email").param("email", user1.getEmail()).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/v1/users/email").param("email", user1.getEmail()).contentType(APPLICATION_JSON))
                 .andDo(log())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(user1.getId().intValue()))
-                .andExpect(jsonPath("$[0].email").value(user1.getEmail()));
+                .andExpect(jsonPath("$.id").value(user1.getId().intValue()))
+                .andExpect(jsonPath("$.email").value(user1.getEmail()));
     }
 
     @Test
@@ -182,7 +181,7 @@ class UserApiIntegrationTest extends IntegrationTestBase {
 
     @Test
     void shouldUpdateUser_whenUpdatingUser() throws Exception {
-        User user1 = existingUser(generateUser());
+        User user = existingUser(generateUser());
 
         String USER_NAME = "Mike";
         String USER_LAST_NAME = "Scott";
@@ -194,7 +193,7 @@ class UserApiIntegrationTest extends IntegrationTestBase {
                 {
                 "firstName": "%s",
                 "lastName": "%s",
-                "birthdate": "%s",
+                "birthDate": "%s",
                 "email": "%s"
                 }
                 """.formatted(
@@ -204,17 +203,16 @@ class UserApiIntegrationTest extends IntegrationTestBase {
                 USER_BIRTHDATE,
                 USER_EMAIL);
 
-        mockMvc.perform(put("/v1/users/{userId}", user1.getId())
+        mockMvc.perform(put("/v1/users/{userId}", user.getId())
                 .contentType(APPLICATION_JSON)
                 .content(updateRequest));
 
-        List<User> allUsers = getAllUsers();
-        User user = allUsers.get(0);
+        User userAfterUpdate = getUser(user.getId());
 
-        assertThat(user.getFirstName()).isEqualTo(USER_NAME);
-        assertThat(user.getLastName()).isEqualTo(USER_LAST_NAME);
-        assertThat(user.getBirthdate()).isEqualTo(LocalDate.parse(USER_BIRTHDATE));
-        assertThat(user.getEmail()).isEqualTo(USER_EMAIL);
+        assertThat(userAfterUpdate.getFirstName()).isEqualTo(USER_NAME);
+        assertThat(userAfterUpdate.getLastName()).isEqualTo(USER_LAST_NAME);
+        assertThat(userAfterUpdate.getBirthdate()).isEqualTo(LocalDate.parse(USER_BIRTHDATE));
+        assertThat(userAfterUpdate.getEmail()).isEqualTo(USER_EMAIL);
     }
 
     public static User generateUser() {

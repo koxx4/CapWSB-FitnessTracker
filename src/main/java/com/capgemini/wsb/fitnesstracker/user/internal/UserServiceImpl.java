@@ -33,7 +33,7 @@ class UserServiceImpl implements UserService, UserProvider {
     }
 
     @Override
-    public Optional<User> getUser(final Long userId) {
+    public Optional<User> findUser(final Long userId) {
         return userRepository.findById(userId);
     }
 
@@ -60,20 +60,25 @@ class UserServiceImpl implements UserService, UserProvider {
     @Override
     @Transactional
     public Optional<User> updateUser(Long userId, UserUpdateDto userUpdateDto) {
-        return userRepository.findById(userId).map(user -> {
-            if (userUpdateDto.firstName() != null) {
-                user.setFirstName(userUpdateDto.firstName());
-            }
-            if (userUpdateDto.lastName() != null) {
-                user.setLastName(userUpdateDto.lastName());
-            }
-            if (userUpdateDto.email() != null) {
-                user.setEmail(userUpdateDto.email());
-            }
-            if (userUpdateDto.birthDate() != null) {
-                user.setBirthdate(userUpdateDto.birthDate());
-            }
-            return userRepository.save(user);
-        });
+        return userRepository.findById(userId)
+                .map(user -> updateUser(userUpdateDto, user))
+                .map(userRepository::save);
+    }
+
+    private User updateUser(UserUpdateDto userUpdateDto, User user) {
+        if (userUpdateDto.firstName() != null) {
+            user.setFirstName(userUpdateDto.firstName());
+        }
+        if (userUpdateDto.lastName() != null) {
+            user.setLastName(userUpdateDto.lastName());
+        }
+        if (userUpdateDto.email() != null) {
+            user.setEmail(userUpdateDto.email());
+        }
+        if (userUpdateDto.birthDate() != null) {
+            user.setBirthdate(userUpdateDto.birthDate());
+        }
+
+        return user;
     }
 }
