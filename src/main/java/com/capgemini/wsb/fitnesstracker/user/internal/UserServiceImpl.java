@@ -62,7 +62,7 @@ class UserServiceImpl implements UserService, UserProvider {
     public List<UserIdEmailDto> findUsersOlderThan(int age) {
         LocalDate cutoffDate = now().minusYears(age);
 
-        return userRepository.findByBirthDateBefore(cutoffDate)
+        return userRepository.findByBirthdateBefore(cutoffDate)
                 .stream()
                 .map(user -> new UserIdEmailDto(user.getId(), user.getEmail()))
                 .toList();
