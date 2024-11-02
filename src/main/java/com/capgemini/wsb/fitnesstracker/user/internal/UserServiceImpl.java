@@ -1,14 +1,15 @@
 package com.capgemini.wsb.fitnesstracker.user.internal;
 
-import com.capgemini.wsb.fitnesstracker.user.api.User;
-import com.capgemini.wsb.fitnesstracker.user.api.UserProvider;
-import com.capgemini.wsb.fitnesstracker.user.api.UserService;
+import com.capgemini.wsb.fitnesstracker.user.api.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,12 @@ class UserServiceImpl implements UserService, UserProvider {
     }
 
     @Override
+    public void deleteUserById(final Long userId) {
+        log.info("Deleting User with ID {}", userId);
+        userRepository.deleteById(userId);
+    }
+
+    @Override
     public Optional<User> getUser(final Long userId) {
         return userRepository.findById(userId);
     }
@@ -39,6 +46,42 @@ class UserServiceImpl implements UserService, UserProvider {
     @Override
     public List<User> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<UserIdEmailDto> findUsersByEmailPart(String emailPart) {
+        return userRepository.findByEmailContainingIgnoreCase(emailPart)
+                .stream()
+                .map(user -> new UserIdEmailDto(user.getId(), user.getEmail()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserIdEmailDto> findUsersOlderThan(int age) {
+        LocalDate cutoffDate = LocalDate.now().minusYears(age);
+        return userRepository.findByBirthDateBefore(cutoffDate)
+                .stream()
+                .map(user -> new UserIdEmailDto(user.getId(), user.getEmail()))
+                .collect(Collectors.toList());
+    }
+    @Override
+    @Transactional
+    public Optional<User> updateUser(Long userId, UserUpdateDto userUpdateDto) {
+        return userRepository.findById(userId).map(user -> {
+            if (userUpdateDto.firstName() != null) {
+                user.setFirstName(userUpdateDto.firstName());
+            }
+            if (userUpdateDto.lastName() != null) {
+                user.setLastName(userUpdateDto.lastName());
+            }
+            if (userUpdateDto.email() != null) {
+                user.setEmail(userUpdateDto.email());
+            }
+            if (userUpdateDto.birthDate() != null) {
+                user.setBirthDate(userUpdateDto.birthDate());
+            }
+            return userRepository.save(user);
+        });
     }
 
 }

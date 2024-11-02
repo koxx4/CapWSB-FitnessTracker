@@ -1,9 +1,8 @@
 package com.capgemini.wsb.fitnesstracker.user.internal;
 
-import com.capgemini.wsb.fitnesstracker.user.api.User;
+import com.capgemini.wsb.fitnesstracker.user.api.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,10 +13,10 @@ import java.util.List;
 class UserController {
 
     private final UserServiceImpl userService;
-
     private final UserMapper userMapper;
 
-    @GetMapping
+    // /v1/users/complex
+    @GetMapping("complex")
     public List<UserDto> getAllUsers() {
         return userService.findAllUsers()
                           .stream()
@@ -25,14 +24,50 @@ class UserController {
                           .toList();
     }
 
-    @PostMapping
-    public User addUser(@RequestBody UserDto userDto) throws InterruptedException {
+    // /v1/users/simple
+    @GetMapping("/simple")
+    public List<UserSimpleDto> getAllSimpleUsers() {
+        return userService.findAllUsers()
+                .stream()
+                .map(userMapper::toSimpleDto)
+                .toList();
+    }
 
-        // Demonstracja how to use @RequestBody
+    // /v1/users/simple
+    @GetMapping("/details")
+    public List<UserDetailsDto> getAllDetailedUsers() {
+        return userService.findAllUsers()
+                .stream()
+                .map(userMapper::toDetailsDto)
+                .toList();
+    }
+
+    @PostMapping
+    public User addUser(@RequestBody UserDto userDto) {
         System.out.println("User with e-mail: " + userDto.email() + "passed to the request");
 
-        // TODO: saveUser with Service and return User
-        return null;
+        return userService.createUser(userMapper.toEntity(userDto));
+    }
+    // DELETE /v1/users/{userId}
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        userService.deleteUserById(userId);
+    }
+    // /v1/users/search
+    @GetMapping("/search")
+    public List<UserIdEmailDto> searchUsersByEmail(@RequestParam String emailPart) {
+        return userService.findUsersByEmailPart(emailPart);
+    }
+    // /v1/users/age
+    @GetMapping("/age")
+    public List<UserIdEmailDto> getUsersOlderThan(@RequestParam int age) {
+        return userService.findUsersOlderThan(age);
+    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserUpdateDto userUpdateDto) {
+        return userService.updateUser(userId, userUpdateDto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

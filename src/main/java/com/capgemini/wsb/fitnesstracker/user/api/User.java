@@ -45,5 +45,16 @@ public class User {
         this.email = email;
     }
 
+    public void setFirstName(String firstName) {
+    }
+
+    public void setLastName(String lastName) {
+    }
+
+    public void setEmail(String email) {
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+    }
 }
 
