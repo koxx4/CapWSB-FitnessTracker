@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static java.time.LocalDate.now;
 
 @Service
 @RequiredArgsConstructor
@@ -50,20 +51,23 @@ class UserServiceImpl implements UserService, UserProvider {
 
     @Override
     public List<UserIdEmailDto> findUsersByEmailPart(String emailPart) {
+
         return userRepository.findByEmailContainingIgnoreCase(emailPart)
                 .stream()
                 .map(user -> new UserIdEmailDto(user.getId(), user.getEmail()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<UserIdEmailDto> findUsersOlderThan(int age) {
-        LocalDate cutoffDate = LocalDate.now().minusYears(age);
+        LocalDate cutoffDate = now().minusYears(age);
+
         return userRepository.findByBirthDateBefore(cutoffDate)
                 .stream()
                 .map(user -> new UserIdEmailDto(user.getId(), user.getEmail()))
-                .collect(Collectors.toList());
+                .toList();
     }
+
     @Override
     @Transactional
     public Optional<User> updateUser(Long userId, UserUpdateDto userUpdateDto) {
@@ -78,7 +82,7 @@ class UserServiceImpl implements UserService, UserProvider {
                 user.setEmail(userUpdateDto.email());
             }
             if (userUpdateDto.birthDate() != null) {
-                user.setBirthDate(userUpdateDto.birthDate());
+                user.setBirthdate(userUpdateDto.birthDate());
             }
             return userRepository.save(user);
         });
