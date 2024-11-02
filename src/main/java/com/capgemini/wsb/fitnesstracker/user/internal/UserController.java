@@ -2,22 +2,29 @@ package com.capgemini.wsb.fitnesstracker.user.internal;
 
 import com.capgemini.wsb.fitnesstracker.user.api.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
 class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
+    private final UserProvider userProvider;
     private final UserMapper userMapper;
 
-    @GetMapping("complex")
+    @GetMapping
     public List<UserDto> getAllUsers() {
-        return userService.findAllUsers()
+        return userProvider.findAllUsers()
                           .stream()
                           .map(userMapper::toDto)
                           .toList();
@@ -25,7 +32,7 @@ class UserController {
 
     @GetMapping("/simple")
     public List<UserSimpleDto> getAllSimpleUsers() {
-        return userService.findAllUsers()
+        return userProvider.findAllUsers()
                 .stream()
                 .map(userMapper::toSimpleDto)
                 .toList();
@@ -33,13 +40,21 @@ class UserController {
 
     @GetMapping("/details")
     public List<UserDetailsDto> getAllDetailedUsers() {
-        return userService.findAllUsers()
+        return userProvider.findAllUsers()
                 .stream()
                 .map(userMapper::toDetailsDto)
                 .toList();
     }
 
+    @GetMapping("/email")
+    public ResponseEntity<UserDetailsDto> getUserByEmail(@RequestParam String email) {
+        return userProvider.findUserByEmail(email)
+                .map(user -> ok(userMapper.toDetailsDto(user)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PostMapping
+    @ResponseStatus(CREATED)
     public User addUser(@RequestBody UserDto userDto) {
         System.out.println("User with e-mail: " + userDto.email() + "passed to the request");
 
@@ -47,18 +62,23 @@ class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @ResponseStatus(NO_CONTENT)
     public void deleteUser(@PathVariable Long userId) {
         userService.deleteUserById(userId);
     }
 
     @GetMapping("/search")
-    public List<UserIdEmailDto> searchUsersByEmail(@RequestParam String emailPart) {
-        return userService.findUsersByEmailPart(emailPart);
+    public List<UserIdEmailDto> searchUsersByEmail(String emailPart) {
+        return userProvider.findUsersByEmailPart(emailPart).stream()
+                .map(userMapper::toUserIdEmailDto)
+                .toList();
     }
 
-    @GetMapping("/age")
-    public List<UserIdEmailDto> getUsersOlderThan(@RequestParam int age) {
-        return userService.findUsersOlderThan(age);
+    @GetMapping("/older/{date}")
+    public List<UserDto> findUsersBornBefore(@PathVariable LocalDate date) {
+        return userProvider.findUsersBornBefore(date).stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @PutMapping("/{userId}")

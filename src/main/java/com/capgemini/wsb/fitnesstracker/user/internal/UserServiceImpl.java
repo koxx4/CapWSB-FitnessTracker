@@ -10,8 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static java.time.LocalDate.now;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -40,7 +38,7 @@ class UserServiceImpl implements UserService, UserProvider {
     }
 
     @Override
-    public Optional<User> getUserByEmail(final String email) {
+    public Optional<User> findUserByEmail(final String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -50,22 +48,13 @@ class UserServiceImpl implements UserService, UserProvider {
     }
 
     @Override
-    public List<UserIdEmailDto> findUsersByEmailPart(String emailPart) {
-
-        return userRepository.findByEmailContainingIgnoreCase(emailPart)
-                .stream()
-                .map(user -> new UserIdEmailDto(user.getId(), user.getEmail()))
-                .toList();
+    public List<User> findUsersByEmailPart(String emailPart) {
+        return userRepository.findByEmailContainingIgnoreCase(emailPart);
     }
 
     @Override
-    public List<UserIdEmailDto> findUsersOlderThan(int age) {
-        LocalDate cutoffDate = now().minusYears(age);
-
-        return userRepository.findByBirthdateBefore(cutoffDate)
-                .stream()
-                .map(user -> new UserIdEmailDto(user.getId(), user.getEmail()))
-                .toList();
+    public List<User> findUsersBornBefore(LocalDate date) {
+        return userRepository.findByBirthdateBefore(date);
     }
 
     @Override
@@ -87,5 +76,4 @@ class UserServiceImpl implements UserService, UserProvider {
             return userRepository.save(user);
         });
     }
-
 }

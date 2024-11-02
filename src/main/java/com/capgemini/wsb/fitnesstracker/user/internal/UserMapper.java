@@ -2,6 +2,7 @@ package com.capgemini.wsb.fitnesstracker.user.internal;
 
 import com.capgemini.wsb.fitnesstracker.user.api.User;
 import com.capgemini.wsb.fitnesstracker.user.api.UserDetailsDto;
+import com.capgemini.wsb.fitnesstracker.user.api.UserIdEmailDto;
 import com.capgemini.wsb.fitnesstracker.user.api.UserSimpleDto;
 import org.springframework.stereotype.Component;
 
@@ -30,5 +31,9 @@ class UserMapper {
 
     UserDetailsDto toDetailsDto(User user) {
         return new UserDetailsDto(user.getFirstName(), user.getBirthdate(), user.getEmail());
+    }
+
+    UserIdEmailDto toUserIdEmailDto(User user) {
+        return new UserIdEmailDto(user.getId(), user.getEmail());
     }
 }
