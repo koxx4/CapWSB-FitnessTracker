@@ -6,3 +6,4 @@ import org.springframework.cglib.core.Local;
 import java.time.LocalDate;
 
 public record UserDetailsDto(String firstName, LocalDate birthDate, String email) { }
+

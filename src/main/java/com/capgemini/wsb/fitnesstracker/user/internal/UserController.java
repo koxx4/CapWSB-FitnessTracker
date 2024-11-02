@@ -1,9 +1,8 @@
 package com.capgemini.wsb.fitnesstracker.user.internal;
 
-import com.capgemini.wsb.fitnesstracker.user.api.User;
-import com.capgemini.wsb.fitnesstracker.user.api.UserDetailsDto;
-import com.capgemini.wsb.fitnesstracker.user.api.UserSimpleDto;
+import com.capgemini.wsb.fitnesstracker.user.api.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,4 +48,26 @@ class UserController {
 
         return userService.createUser(userMapper.toEntity(userDto));
     }
+    // DELETE /v1/users/{userId}
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        userService.deleteUserById(userId);
+    }
+    // /v1/users/search
+    @GetMapping("/search")
+    public List<UserIdEmailDto> searchUsersByEmail(@RequestParam String emailPart) {
+        return userService.findUsersByEmailPart(emailPart);
+    }
+    // /v1/users/age
+    @GetMapping("/age")
+    public List<UserIdEmailDto> getUsersOlderThan(@RequestParam int age) {
+        return userService.findUsersOlderThan(age);
+    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserUpdateDto userUpdateDto) {
+        return userService.updateUser(userId, userUpdateDto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }
