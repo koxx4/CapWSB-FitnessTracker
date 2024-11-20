@@ -1,7 +1,6 @@
 package com.capgemini.wsb.fitnesstracker.loader;
 
 import com.capgemini.wsb.fitnesstracker.training.api.Training;
-import com.capgemini.wsb.fitnesstracker.training.internal.ActivityType;
 import com.capgemini.wsb.fitnesstracker.user.api.User;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +12,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.capgemini.wsb.fitnesstracker.training.internal.ActivityType.*;
 import static java.time.LocalDate.now;
+import static java.time.LocalDateTime.parse;
 import static java.util.Objects.isNull;
 
 /**
@@ -54,9 +55,9 @@ class InitialDataLoader {
 
     private User generateUser(String name, String lastName, int age) {
         User user = new User(name,
-                             lastName,
-                             now().minusYears(age),
-                             "%s.%s@domain.com".formatted(name, lastName));
+                lastName,
+                now().minusYears(age),
+                "%s.%s@domain.com".formatted(name, lastName));
         return userRepository.save(user);
     }
 
@@ -81,68 +82,68 @@ class InitialDataLoader {
         List<Training> trainingData = new ArrayList<>();
 
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             Training training1 = new Training(users.get(0),
-                                              sdf.parse("2024-01-19 08:00:00"),
-                                              sdf.parse("2024-01-19 09:30:00"),
-                                              ActivityType.RUNNING,
-                                              10.5,
-                                              8.2);
+                    parse("2024-01-19 08:00:00", dtf),
+                    parse("2024-01-19 09:30:00", dtf),
+                    RUNNING,
+                    10.5,
+                    8.2);
             Training training2 = new Training(users.get(1),
-                                              sdf.parse("2024-01-18 15:30:00"),
-                                              sdf.parse("2024-01-18 17:00:00"),
-                                              ActivityType.CYCLING,
-                                              25.0,
-                                              18.5);
+                    parse("2024-01-18 15:30:00", dtf),
+                    parse("2024-01-18 17:00:00", dtf),
+                    CYCLING,
+                    25.0,
+                    18.5);
             Training training3 = new Training(users.get(2),
-                                              sdf.parse("2024-01-17 07:45:00"),
-                                              sdf.parse("2024-01-17 09:00:00"),
-                                              ActivityType.WALKING,
-                                              5.2,
-                                              5.8);
+                    parse("2024-01-17 07:45:00", dtf),
+                    parse("2024-01-17 09:00:00", dtf),
+                    WALKING,
+                    5.2,
+                    5.8);
             Training training4 = new Training(users.get(3),
-                                              sdf.parse("2024-01-16 18:00:00"),
-                                              sdf.parse("2024-01-16 19:30:00"),
-                                              ActivityType.RUNNING,
-                                              12.3,
-                                              9.0);
+                    parse("2024-01-16 18:00:00", dtf),
+                    parse("2024-01-16 19:30:00", dtf),
+                    RUNNING,
+                    12.3,
+                    9.0);
             Training training5 = new Training(users.get(4),
-                                              sdf.parse("2024-01-15 12:30:00"),
-                                              sdf.parse("2024-01-15 13:45:00"),
-                                              ActivityType.CYCLING,
-                                              18.7,
-                                              15.3);
+                    parse("2024-01-15 12:30:00", dtf),
+                    parse("2024-01-15 13:45:00", dtf),
+                    CYCLING,
+                    18.7,
+                    15.3);
             Training training6 = new Training(users.get(5),
-                                              sdf.parse("2024-01-14 09:00:00"),
-                                              sdf.parse("2024-01-14 10:15:00"),
-                                              ActivityType.WALKING,
-                                              3.5,
-                                              4.0);
+                    parse("2024-01-14 09:00:00", dtf),
+                    parse("2024-01-14 10:15:00", dtf),
+                    WALKING,
+                    3.5,
+                    4.0);
             Training training7 = new Training(users.get(6),
-                                              sdf.parse("2024-01-13 16:45:00"),
-                                              sdf.parse("2024-01-13 18:30:00"),
-                                              ActivityType.RUNNING,
-                                              15.0,
-                                              10.8);
+                    parse("2024-01-13 16:45:00", dtf),
+                    parse("2024-01-13 18:30:00", dtf),
+                    RUNNING,
+                    15.0,
+                    10.8);
             Training training8 = new Training(users.get(7),
-                                              sdf.parse("2024-01-12 11:30:00"),
-                                              sdf.parse("2024-01-12 12:45:00"),
-                                              ActivityType.CYCLING,
-                                              22.5,
-                                              17.2);
+                    parse("2024-01-12 11:30:00", dtf),
+                    parse("2024-01-12 12:45:00", dtf),
+                    CYCLING,
+                    22.5,
+                    17.2);
             Training training9 = new Training(users.get(8),
-                                              sdf.parse("2024-01-11 07:15:00"),
-                                              sdf.parse("2024-01-11 08:30:00"),
-                                              ActivityType.WALKING,
-                                              4.2,
-                                              4.5);
+                    parse("2024-01-11 07:15:00", dtf),
+                    parse("2024-01-11 08:30:00", dtf),
+                    WALKING,
+                    4.2,
+                    4.5);
             Training training10 = new Training(users.get(9),
-                                               sdf.parse("2024-01-10 14:00:00"),
-                                               sdf.parse("2024-01-10 15:15:00"),
-                                               ActivityType.RUNNING,
-                                               11.8,
-                                               8.5);
+                    parse("2024-01-10 14:00:00", dtf),
+                    parse("2024-01-10 15:15:00", dtf),
+                    RUNNING,
+                    11.8,
+                    8.5);
 
             trainingData.add(training1);
             trainingData.add(training2);
@@ -156,12 +157,13 @@ class InitialDataLoader {
             trainingData.add(training10);
 
             trainingData.forEach(training -> trainingRepository.save(training));
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             e.printStackTrace();
         }
 
         return trainingData;
     }
+
     private void verifyDependenciesAutowired() {
         if (isNull(userRepository)) {
             throw new IllegalStateException("Initial data loader was not autowired correctly " + this);

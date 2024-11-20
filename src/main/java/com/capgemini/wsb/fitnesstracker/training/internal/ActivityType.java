@@ -1,6 +1,9 @@
 package com.capgemini.wsb.fitnesstracker.training.internal;
 
-// TODO : JavaDoc
+
+/**
+ * Typ wyliczeniowy reprezentujący różne rodzaje aktywności fizycznej.
+ */
 public enum ActivityType {
 
     RUNNING("Running"),
@@ -15,8 +18,12 @@ public enum ActivityType {
         this.displayName = displayName;
     }
 
+    /**
+     * Zwraca nazwę wyświetlaną aktywności.
+     *
+     * @return nazwa wyświetlana aktywności
+     */
     public String getDisplayName() {
         return displayName;
     }
-
 }
